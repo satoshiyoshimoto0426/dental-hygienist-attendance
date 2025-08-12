@@ -21,7 +21,7 @@ export interface TableColumn {
   label: string;
   minWidth?: number;
   align?: 'left' | 'center' | 'right';
-  format?: (value: any) => React.ReactNode;
+    format?: (value: any, row?: any) => React.ReactNode;
   hideOnMobile?: boolean;
   mobileLabel?: string;
 }
@@ -80,7 +80,7 @@ export const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
                 .filter(column => !column.hideOnMobile)
                 .map((column) => {
                   const value = row[column.id];
-                  const displayValue = column.format ? column.format(value) : value;
+                    const displayValue = column.format ? column.format(value, row) : value;
                   const label = column.mobileLabel || column.label;
 
                   return (
@@ -154,7 +154,7 @@ export const ResponsiveTable: React.FC<ResponsiveTableProps> = ({
             >
               {columns.map((column) => {
                 const value = row[column.id];
-                const displayValue = column.format ? column.format(value) : value;
+                const displayValue = column.format ? column.format(value, row) : value;
 
                 return (
                   <TableCell key={column.id} align={column.align}>

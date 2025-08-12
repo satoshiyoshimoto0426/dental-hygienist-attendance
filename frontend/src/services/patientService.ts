@@ -1,5 +1,5 @@
 import apiClient from './api';
-import { Patient, CreatePatientRequest, UpdatePatientRequest } from '../types/Patient';
+import { Patient, CreatePatientRequest } from '../types/Patient';
 import { ApiResponse } from '../types/Api';
 
 export class PatientService {

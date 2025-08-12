@@ -1,5 +1,5 @@
 import apiClient from './api';
-import { Hygienist, CreateHygienistRequest, UpdateHygienistRequest } from '../types/Hygienist';
+import { Hygienist, CreateHygienistRequest } from '../types/Hygienist';
 import { ApiResponse } from '../types/Api';
 
 export class HygienistService {

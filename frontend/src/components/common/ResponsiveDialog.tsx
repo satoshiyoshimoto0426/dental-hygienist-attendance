@@ -49,7 +49,7 @@ export const ResponsiveDialog: React.FC<ResponsiveDialogProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleClose = (event: {}, reason: 'backdropClick' | 'escapeKeyDown') => {
+    const handleClose = (_event: {}, reason: 'backdropClick' | 'escapeKeyDown') => {
     if (disableBackdropClick && reason === 'backdropClick') {
       return;
     }

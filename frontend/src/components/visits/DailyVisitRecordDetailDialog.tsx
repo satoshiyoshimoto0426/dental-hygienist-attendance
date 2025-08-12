@@ -25,30 +25,28 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { DailyVisitRecord, DailyVisitStatus } from '../../types/DailyVisitRecord';
+import { DailyVisitRecord } from '../../types/DailyVisitRecord';
 
 
 interface DailyVisitRecordDetailDialogProps {
   open: boolean;
   onClose: () => void;
   record: DailyVisitRecord | null;
-  onEdit: (record: DailyVisitRecord) => void;
-  onDelete: (record: DailyVisitRecord) => void;
-  onStatusChange: (recordId: number, status: DailyVisitStatus, cancellationReason?: string) => Promise<void>;
-  onOpenStatusManager?: (record: DailyVisitRecord) => void;
-  loading?: boolean;
-}
+    onEdit: (record: DailyVisitRecord) => void;
+    onDelete: (record: DailyVisitRecord) => void;
+    onOpenStatusManager?: (record: DailyVisitRecord) => void;
+    loading?: boolean;
+  }
 
-export const DailyVisitRecordDetailDialog: React.FC<DailyVisitRecordDetailDialogProps> = ({
-  open,
-  onClose,
-  record,
-  onEdit,
-  onDelete,
-  onStatusChange,
-  onOpenStatusManager,
-  loading = false
-}) => {
+  export const DailyVisitRecordDetailDialog: React.FC<DailyVisitRecordDetailDialogProps> = ({
+    open,
+    onClose,
+    record,
+    onEdit,
+    onDelete,
+    onOpenStatusManager,
+    loading = false
+  }) => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   if (!record) {
