@@ -1,0 +1,141 @@
+/* レスポンシブデザイン用のグローバルスタイル */
+
+/* タッチデバイス用の最適化 */
+@media (hover: none) and (pointer: coarse) {
+  /* タッチターゲットのサイズを最適化 */
+  button,
+  .MuiButton-root,
+  .MuiIconButton-root,
+  .MuiListItemButton-root {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* タッチフィードバックの改善 */
+  .MuiButton-root:active,
+  .MuiIconButton-root:active,
+  .MuiListItemButton-root:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-in-out;
+  }
+}
+
+/* モバイル用のスクロール最適化 */
+@media (max-width: 600px) {
+  /* スムーズスクロール */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* オーバースクロールの制御 */
+  body {
+    overscroll-behavior: contain;
+  }
+
+  /* フォーカス時のズーム防止 */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px; /* iOS Safariでのズーム防止 */
+  }
+
+  /* タッチ操作の改善 */
+  .MuiTextField-root input {
+    font-size: 16px;
+  }
+
+  /* カード要素のタッチ最適化 */
+  .MuiCard-root {
+    cursor: pointer;
+  }
+
+  /* テーブル行のタッチ最適化 */
+  .MuiTableRow-root {
+    cursor: pointer;
+  }
+
+  /* ダイアログのスクロール最適化 */
+  .MuiDialog-paper {
+    max-height: calc(100vh - 32px);
+  }
+
+  /* フローティングアクションボタンの位置調整 */
+  .MuiFab-root {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    z-index: 1300 !important;
+  }
+}
+
+/* タブレット用の最適化 */
+@media (min-width: 601px) and (max-width: 960px) {
+  /* タブレット用のレイアウト調整 */
+  .MuiContainer-root {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* カードのマージン調整 */
+  .MuiCard-root {
+    margin-bottom: 16px;
+  }
+}
+
+/* 横向きモバイル用の最適化 */
+@media (max-width: 960px) and (orientation: landscape) {
+  /* ヘッダーの高さを調整 */
+  .MuiAppBar-root {
+    min-height: 48px;
+  }
+
+  .MuiToolbar-root {
+    min-height: 48px;
+  }
+
+  /* ダイアログの高さ調整 */
+  .MuiDialog-paper {
+    max-height: calc(100vh - 16px);
+  }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  /* ダークモード時の調整があれば追加 */
+}
+
+/* 高コントラスト対応 */
+@media (prefers-contrast: high) {
+  .MuiButton-root,
+  .MuiIconButton-root {
+    border: 2px solid currentColor;
+  }
+}
+
+/* アニメーション無効化対応 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* プリント用スタイル */
+@media print {
+  .MuiFab-root,
+  .MuiAppBar-root,
+  .MuiDrawer-root {
+    display: none !important;
+  }
+
+  .MuiContainer-root {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
