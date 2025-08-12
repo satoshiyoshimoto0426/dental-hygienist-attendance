@@ -93,7 +93,7 @@ const PatientList: React.FC<PatientListProps> = ({
       label: '操作',
       minWidth: 120,
       align: 'center' as const,
-      format: (value: any, row: Patient) => (
+        format: (_value: any, row: Patient) => (
         <Stack direction="row" spacing={1} justifyContent="center">
           <Tooltip title="編集">
             <IconButton

@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardActionArea,
-  Avatar,
-  Paper,
+    Grid,
+    Card,
+    CardActionArea,
+    Avatar,
+    Paper,
   useTheme
 } from '@mui/material';
 import {

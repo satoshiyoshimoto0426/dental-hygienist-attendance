@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   TextField,
@@ -7,7 +7,6 @@ import {
   Select,
   MenuItem,
   Grid,
-  Box,
   FormHelperText,
   Stack
 } from '@mui/material';
@@ -17,12 +16,11 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ja } from 'date-fns/locale';
 import { format } from 'date-fns';
-import { 
-  DailyVisitRecord, 
-  CreateDailyVisitRecordInput, 
+import {
+  DailyVisitRecord,
+  CreateDailyVisitRecordInput,
   UpdateDailyVisitRecordInput,
-  DailyVisitStatus,
-  DailyVisitRecordFormData
+  DailyVisitStatus
 } from '../../types/DailyVisitRecord';
 import { Patient } from '../../types/Patient';
 import { Hygienist } from '../../types/Hygienist';
@@ -30,7 +28,6 @@ import { useFormValidation } from '../../hooks/useFormValidation';
 import { visitRecordValidationRules } from '../../utils/validationRules';
 import { useApiError } from '../../hooks/useApiError';
 import { ResponsiveDialog } from '../common/ResponsiveDialog';
-import { useResponsive } from '../../hooks/useResponsive';
 
 interface DailyVisitRecordFormProps {
   open: boolean;
@@ -76,7 +73,6 @@ export const DailyVisitRecordForm: React.FC<DailyVisitRecordFormProps> = ({
   loading = false
 }) => {
   const { handleApiError, handleSuccess } = useApiError();
-  const { isMobile } = useResponsive();
 
   const {
     values,
@@ -179,21 +175,19 @@ export const DailyVisitRecordForm: React.FC<DailyVisitRecordFormProps> = ({
       spacing={2} 
       sx={{ width: { xs: '100%', sm: 'auto' } }}
     >
-      <Button 
-        onClick={handleClose} 
-        disabled={loading}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 2, sm: 1 } }}
-      >
+        <Button
+          onClick={handleClose}
+          disabled={loading}
+          sx={{ order: { xs: 2, sm: 1 }, width: { xs: '100%', sm: 'auto' } }}
+        >
         キャンセル
       </Button>
-      <Button 
-        onClick={handleSubmit} 
-        variant="contained" 
-        disabled={loading || hasErrors}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 1, sm: 2 } }}
-      >
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={loading || hasErrors}
+          sx={{ order: { xs: 1, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}
+        >
         {loading ? '保存中...' : '保存'}
       </Button>
     </Stack>

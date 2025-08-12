@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import {
   Box,
   Tabs,
-  Tab,
-  Typography
+  Tab
 } from '@mui/material';
 import { PatientReport } from '../components/reports/PatientReport';
 import { PatientComparisonReport } from '../components/reports/PatientComparisonReport';
@@ -43,9 +42,9 @@ function a11yProps(index: number) {
 export const PatientReports: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+      setTabValue(newValue);
+    };
 
   return (
     <Box sx={{ width: '100%' }}>

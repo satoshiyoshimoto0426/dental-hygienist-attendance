@@ -19,16 +19,16 @@ import {
   Paper,
   Chip,
   Alert,
-  CircularProgress,
-  Divider
-} from '@mui/material';
+    CircularProgress,
+    Divider
+  } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ja } from 'date-fns/locale';
 import { format } from 'date-fns';
 import { Patient } from '../../types/Patient';
-import { PatientMonthlyStats, PatientVisitDetail } from '../../types/PatientReport';
+import { PatientMonthlyStats } from '../../types/PatientReport';
 import { PatientService } from '../../services/patientService';
 import { PatientReportService } from '../../services/patientReportService';
 import { CsvExportService } from '../../services/csvExportService';
@@ -49,7 +49,7 @@ export const PatientReport: React.FC = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const patientsData = await PatientService.getAllPatients();
+          const patientsData = await PatientService.getPatients();
         setPatients(patientsData);
       } catch (error) {
         console.error('患者一覧取得エラー:', error);

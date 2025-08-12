@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Calendar, momentLocalizer, Event, View } from 'react-big-calendar';
+import { Calendar, momentLocalizer, View } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/ja';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -15,11 +15,9 @@ import {
   IconButton
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Refresh as RefreshIcon
-} from '@mui/icons-material';
+    Add as AddIcon,
+    Refresh as RefreshIcon
+  } from '@mui/icons-material';
 import { 
   DailyVisitRecord, 
   CalendarEvent,
@@ -32,11 +30,6 @@ import { Hygienist } from '../../types/Hygienist';
 import { DailyVisitRecordForm } from './DailyVisitRecordForm';
 import { DailyVisitRecordDetailDialog } from './DailyVisitRecordDetailDialog';
 import { DailyVisitRecordStatusManager } from './DailyVisitRecordStatusManager';
-import { DailyVisitRecordService } from '../../services/dailyVisitRecordService';
-import { PatientService } from '../../services/patientService';
-import { HygienistService } from '../../services/hygienistService';
-import { DailyVisitRecordForm } from './DailyVisitRecordForm';
-import { DailyVisitRecordDetailDialog } from './DailyVisitRecordDetailDialog';
 import { DailyVisitRecordService } from '../../services/dailyVisitRecordService';
 import { PatientService } from '../../services/patientService';
 import { HygienistService } from '../../services/hygienistService';
@@ -83,7 +76,7 @@ export const DailyVisitCalendar: React.FC<DailyVisitCalendarProps> = ({ classNam
   const [formLoading, setFormLoading] = useState(false);
   
   // 詳細ダイアログ関連の状態
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [detailRecord, setDetailRecord] = useState<DailyVisitRecord | null>(null);
   
   // ステータス管理関連の状態
@@ -385,19 +378,18 @@ export const DailyVisitCalendar: React.FC<DailyVisitCalendarProps> = ({ classNam
       </Paper>
 
       {/* 詳細ダイアログ */}
-      <DailyVisitRecordDetailDialog
-        open={detailDialogOpen}
-        onClose={() => setDetailDialogOpen(false)}
-        record={detailRecord}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onStatusChange={handleStatusChange}
-        onOpenStatusManager={(record) => {
-          setStatusRecord(record);
-          setStatusManagerOpen(true);
-        }}
-        loading={loading}
-      />
+        <DailyVisitRecordDetailDialog
+          open={detailOpen}
+          onClose={() => setDetailOpen(false)}
+          record={detailRecord}
+          onEdit={handleEditFromDetail}
+          onDelete={handleDelete}
+          onOpenStatusManager={(record) => {
+            setStatusRecord(record);
+            setStatusManagerOpen(true);
+          }}
+          loading={loading}
+        />
 
       {/* フォームダイアログ */}
       <DailyVisitRecordForm

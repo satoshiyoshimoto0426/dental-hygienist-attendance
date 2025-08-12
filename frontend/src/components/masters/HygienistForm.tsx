@@ -130,22 +130,20 @@ const HygienistForm: React.FC<HygienistFormProps> = ({
       spacing={2} 
       sx={{ width: { xs: '100%', sm: 'auto' } }}
     >
-      <Button 
-        onClick={handleClose} 
-        disabled={loading}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 2, sm: 1 } }}
-      >
+        <Button
+          onClick={handleClose}
+          disabled={loading}
+          sx={{ order: { xs: 2, sm: 1 }, width: { xs: '100%', sm: 'auto' } }}
+        >
         キャンセル
       </Button>
-      <Button
-        onClick={handleSubmit}
-        variant="contained"
-        disabled={loading || hasErrors}
-        startIcon={loading ? <CircularProgress size={20} /> : null}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 1, sm: 2 } }}
-      >
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={loading || hasErrors}
+          startIcon={loading ? <CircularProgress size={20} /> : null}
+          sx={{ order: { xs: 1, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}
+        >
         {isEditMode ? '更新' : '登録'}
       </Button>
     </Stack>
