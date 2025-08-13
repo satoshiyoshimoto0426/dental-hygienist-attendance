@@ -38,6 +38,9 @@ jobs:
       run: |
         cd frontend
         npm run build
+      env:
+        VITE_DEMO_MODE: true
+        VITE_ENVIRONMENT: production
         
     - name: Setup Pages
       uses: actions/configure-pages@v4

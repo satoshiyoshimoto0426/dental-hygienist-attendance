@@ -9,6 +9,7 @@ export interface EnvironmentConfig {
     title: string;
     version: string;
     environment: string;
+    demoMode: boolean;
   };
   
   // セキュリティ設定
@@ -32,6 +33,7 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
       title: import.meta.env.VITE_APP_TITLE || '歯科衛生士月間勤怠システム',
       version: import.meta.env.VITE_APP_VERSION || '1.0.0',
       environment: import.meta.env.VITE_ENVIRONMENT || 'development',
+      demoMode: import.meta.env.VITE_DEMO_MODE === 'true',
     },
     security: {
       enableDevtools: import.meta.env.VITE_ENABLE_DEVTOOLS === 'true',
@@ -47,6 +49,7 @@ export const config = getEnvironmentConfig();
 // 環境判定のヘルパー
 export const isDevelopment = config.app.environment === 'development';
 export const isProduction = config.app.environment === 'production';
+export const isDemoMode = config.app.demoMode;
 
 // ログレベルの判定
 export const shouldLog = (level: 'debug' | 'info' | 'warn' | 'error'): boolean => {
