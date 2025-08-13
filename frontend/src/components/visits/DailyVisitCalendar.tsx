@@ -35,11 +35,6 @@ import { DailyVisitRecordStatusManager } from './DailyVisitRecordStatusManager';
 import { DailyVisitRecordService } from '../../services/dailyVisitRecordService';
 import { PatientService } from '../../services/patientService';
 import { HygienistService } from '../../services/hygienistService';
-import { DailyVisitRecordForm } from './DailyVisitRecordForm';
-import { DailyVisitRecordDetailDialog } from './DailyVisitRecordDetailDialog';
-import { DailyVisitRecordService } from '../../services/dailyVisitRecordService';
-import { PatientService } from '../../services/patientService';
-import { HygienistService } from '../../services/hygienistService';
 
 // moment.jsの日本語設定
 moment.locale('ja');
@@ -159,14 +154,22 @@ export const DailyVisitCalendar: React.FC<DailyVisitCalendarProps> = ({ classNam
   // イベントクリック時の処理（詳細表示）
   const handleSelectEvent = (event: CalendarEvent) => {
     setDetailRecord(event.resource);
-    setDetailOpen(true);
+    setDetailDialogOpen(true);
   };
 
   // 詳細ダイアログから編集モードへ
   const handleEditFromDetail = (record: DailyVisitRecord) => {
     setSelectedRecord(record);
     setSelectedDate(undefined);
-    setDetailOpen(false);
+    setDetailDialogOpen(false);
+    setFormOpen(true);
+  };
+
+  // 編集ハンドラー
+  const handleEdit = (record: DailyVisitRecord) => {
+    setSelectedRecord(record);
+    setSelectedDate(undefined);
+    setDetailDialogOpen(false);
     setFormOpen(true);
   };
 
