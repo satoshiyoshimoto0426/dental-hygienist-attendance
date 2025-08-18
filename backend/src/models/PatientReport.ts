@@ -17,7 +17,7 @@ export class PatientReportModel {
     try {
       // 患者情報を取得
       const patientResult = await pool.query(
-        'SELECT id, name, patient_id FROM patients WHERE id = $1',
+        'SELECT id, name, patient_id, phone, email, address FROM patients WHERE id = $1',
         [params.patientId]
       );
 
@@ -93,6 +93,9 @@ export class PatientReportModel {
       return {
         patientId: patient.id,
         patientName: patient.name,
+        phone: patient.phone,
+        email: patient.email,
+        address: patient.address,
         year: params.year,
         month: params.month,
         totalVisits,

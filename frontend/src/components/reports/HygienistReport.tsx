@@ -82,6 +82,9 @@ export const HygienistReport: React.FC = () => {
     }
   };
 
+  const selectedHygienist = hygienists.find(h => h.id === selectedHygienistId);
+  const displayHygienistName = reportData?.hygienistName || selectedHygienist?.name || '';
+
   // 年の選択肢を生成
   const generateYearOptions = () => {
     const currentYear = new Date().getFullYear();
@@ -239,7 +242,7 @@ export const HygienistReport: React.FC = () => {
             <CardContent>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h6">
-                  {reportData.hygienistName}さんの{reportData.year}年{reportData.month}月統計
+                  {displayHygienistName}さんの{reportData.year}年{reportData.month}月統計
                 </Typography>
                 <ExportButton
                   onExport={handleCsvExport}

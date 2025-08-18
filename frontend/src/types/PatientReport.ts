@@ -8,6 +8,9 @@
 export interface PatientMonthlyStats {
   patientId: number;
   patientName: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   year: number;
   month: number;
   totalVisits: number;

@@ -8,6 +8,9 @@ describe('CsvExportService', () => {
       const mockData: PatientMonthlyStats = {
         patientId: 1,
         patientName: '田中太郎',
+        phone: '090-1234-5678',
+        email: 'taro@example.com',
+        address: '東京都新宿区1-2-3',
         year: 2024,
         month: 1,
         totalVisits: 5,
@@ -59,6 +62,9 @@ describe('CsvExportService', () => {
       const mockData: PatientMonthlyStats = {
         patientId: 2,
         patientName: '山田花子',
+        phone: '080-0000-0000',
+        email: 'hanako@example.com',
+        address: '大阪府大阪市1-2-3',
         year: 2024,
         month: 2,
         totalVisits: 0,
@@ -161,6 +167,9 @@ describe('CsvExportService', () => {
       const mockData: PatientMonthlyStats = {
         patientId: 1,
         patientName: 'テスト患者',
+        phone: '000',
+        email: 'test@example.com',
+        address: 'Test Address',
         year: 2024,
         month: 1,
         totalVisits: 3,

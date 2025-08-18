@@ -9,9 +9,15 @@ export class CsvExportService {
    * 患者別レポートをCSV形式に変換
    */
   static convertPatientReportToCsv(data: PatientMonthlyStats): string {
+    const infoRows = [
+      ['患者名', data.patientName],
+      ['患者ID', data.patientId.toString()],
+      ['電話番号', data.phone || ''],
+      ['メールアドレス', data.email || ''],
+      ['住所', data.address || '']
+    ];
+
     const headers = [
-      '患者名',
-      '患者ID', 
       '対象年月',
       '総訪問回数',
       '完了回数',
@@ -26,8 +32,6 @@ export class CsvExportService {
       Math.round((data.completedVisits / data.totalVisits) * 100) : 0;
 
     const summaryRow = [
-      data.patientName,
-      data.patientId.toString(),
       `${data.year}年${data.month}月`,
       data.totalVisits.toString(),
       data.completedVisits.toString(),
@@ -40,16 +44,6 @@ export class CsvExportService {
 
     // 詳細データのヘッダー
     const detailHeaders = [
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
       '訪問日',
       '開始時間',
       '終了時間',
@@ -62,7 +56,6 @@ export class CsvExportService {
     ];
 
     const detailRows = data.visitDetails.map(visit => [
-      '', '', '', '', '', '', '', '', '', '', // 空のセル（サマリー部分）
       visit.visitDate.toLocaleDateString('ja-JP'),
       visit.startTime || '',
       visit.endTime || '',
@@ -75,6 +68,8 @@ export class CsvExportService {
     ]);
 
     const csvRows = [
+      ...infoRows,
+      [],
       headers,
       summaryRow,
       [], // 空行
