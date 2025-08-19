@@ -89,6 +89,9 @@ export const PatientReport: React.FC = () => {
     }
   };
 
+  const selectedPatient = patients.find(p => p.id === selectedPatientId);
+  const displayPatientName = reportData?.patientName || selectedPatient?.name || '';
+
   // 訪問状態のチップ色を取得
   const getStatusChipColor = (status: string) => {
     switch (status) {
@@ -215,7 +218,7 @@ export const PatientReport: React.FC = () => {
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                   <Typography variant="h6">
-                    {reportData.patientName}さんの統計 ({reportData.year}年{reportData.month}月)
+                    {displayPatientName}さんの統計 ({reportData.year}年{reportData.month}月)
                   </Typography>
                   <ExportButton
                     onExport={handleCsvExport}
