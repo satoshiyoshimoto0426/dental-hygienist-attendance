@@ -4,8 +4,7 @@ import {
   CreateMonthlyReportInput, 
   UpdateMonthlyReportInput, 
   MonthlyReportRow,
-  MonthlyReportWithRelations,
-  MonthlyReportStats
+  MonthlyReportWithRelations
 } from '../types/MonthlyReport';
 import { DailyVisitRecordModel } from './DailyVisitRecord';
 import { monthlyReportValidationSchema, formatValidationError } from '../utils/validation';
@@ -18,7 +17,7 @@ export class MonthlyReportModel {
    * データベース行を MonthlyReport オブジェクトに変換
    */
   private static rowToMonthlyReport(row: MonthlyReportRow): MonthlyReport {
-    return {
+    const report: MonthlyReport = {
       id: row.id,
       patientId: row.patient_id,
       hygienistId: row.hygienist_id,
@@ -28,14 +27,17 @@ export class MonthlyReportModel {
       totalHours: parseFloat(row.total_hours.toString()),
       completedVisits: row.completed_visits,
       cancelledVisits: row.cancelled_visits,
-      summary: row.summary,
-      careManagerNotes: row.care_manager_notes,
       status: row.status,
-      submittedAt: row.submitted_at,
-      approvedAt: row.approved_at,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
+    
+    if (row.summary) report.summary = row.summary;
+    if (row.care_manager_notes) report.careManagerNotes = row.care_manager_notes;
+    if (row.submitted_at) report.submittedAt = row.submitted_at;
+    if (row.approved_at) report.approvedAt = row.approved_at;
+    
+    return report;
   }
 
   /**

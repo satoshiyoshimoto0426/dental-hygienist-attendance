@@ -56,29 +56,41 @@ export interface EnvironmentConfig {
 
 // 環境変数の検証とデフォルト値の設定
 const getEnvironmentConfig = (): EnvironmentConfig => {
-  const requiredEnvVars = [
-    'DB_HOST',
-    'DB_PORT',
-    'DB_NAME',
-    'DB_USER',
-    'DB_PASSWORD',
-    'JWT_SECRET'
-  ];
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const useMockDB = process.env.USE_MOCK_DB === 'true';
+  
+  // 開発環境でモックDBを使用する場合は、DB設定をスキップ
+  if (!isDevelopment || !useMockDB) {
+    const requiredEnvVars = [
+      'DB_HOST',
+      'DB_PORT',
+      'DB_NAME',
+      'DB_USER',
+      'DB_PASSWORD',
+      'JWT_SECRET'
+    ];
 
-  // 必須環境変数のチェック
-  for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-      throw new Error(`必須の環境変数 ${envVar} が設定されていません`);
+    // 必須環境変数のチェック
+    for (const envVar of requiredEnvVars) {
+      if (!process.env[envVar]) {
+        throw new Error(`必須の環境変数 ${envVar} が設定されていません`);
+      }
+    }
+  } else {
+    // モックDB使用時はJWT_SECRETのみチェック
+    if (!process.env.JWT_SECRET) {
+      // 開発環境用のデフォルトシークレットを設定
+      process.env.JWT_SECRET = 'dev-secret-key-change-in-production';
     }
   }
 
   return {
     database: {
-      host: process.env.DB_HOST!,
-      port: parseInt(process.env.DB_PORT!, 10),
-      name: process.env.DB_NAME!,
-      user: process.env.DB_USER!,
-      password: process.env.DB_PASSWORD!,
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      name: process.env.DB_NAME || 'dental_hygienist_db',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || 'password',
     },
     jwt: {
       secret: process.env.JWT_SECRET!,

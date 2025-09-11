@@ -133,8 +133,8 @@ const PatientForm: React.FC<PatientFormProps> = ({
       <Button 
         onClick={handleClose} 
         disabled={loading}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 2, sm: 1 } }}
+        fullWidth
+        sx={{ order: { xs: 2, sm: 1 }, width: { xs: '100%', sm: 'auto' } }}
       >
         キャンセル
       </Button>
@@ -143,8 +143,8 @@ const PatientForm: React.FC<PatientFormProps> = ({
         variant="contained"
         disabled={loading || hasErrors}
         startIcon={loading ? <CircularProgress size={20} /> : null}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 1, sm: 2 } }}
+        fullWidth
+        sx={{ order: { xs: 1, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}
       >
         {isEditMode ? '更新' : '登録'}
       </Button>

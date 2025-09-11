@@ -93,41 +93,44 @@ const PatientList: React.FC<PatientListProps> = ({
       label: '操作',
       minWidth: 120,
       align: 'center' as const,
-      format: (value: any, row: Patient) => (
-        <Stack direction="row" spacing={1} justifyContent="center">
-          <Tooltip title="編集">
-            <IconButton
-              size="small"
-              color="primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(row);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="削除">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(row);
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      )
+      format: (value: any) => {
+        const patient = value as Patient;
+        return (
+          <Stack direction="row" spacing={1} justifyContent="center">
+            <Tooltip title="編集">
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(patient);
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="削除">
+              <IconButton
+                size="small"
+                color="error"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(patient);
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        );
+      }
     }
   ];
 
   // テーブル用のデータを準備
   const tableRows = patients.map(patient => ({
     ...patient,
-    actions: null // アクションは format 関数で処理
+    actions: patient  // actionsカラムにpatientオブジェクト自体を渡す
   }));
 
   if (loading) {

@@ -32,7 +32,6 @@ class AuthService {
       const mockUser: User = {
         id: 1,
         username: 'admin',
-        name: 'デモ管理者',
         role: 'admin'
       };
       
@@ -44,8 +43,7 @@ class AuthService {
       return {
         success: true,
         token: mockToken,
-        user: mockUser,
-        message: 'デモモードでログインしました'
+        user: mockUser
       };
     } else {
       throw new Error('デモモードでは admin/admin でログインしてください');

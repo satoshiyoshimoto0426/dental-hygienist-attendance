@@ -6,7 +6,7 @@ import { AppError, ERROR_CODES } from '../types/ApiResponse';
  * バリデーションミドルウェアのファクトリー関数
  */
 export const validate = (schema: Joi.ObjectSchema, source: 'body' | 'params' | 'query' = 'body') => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const data = req[source];
     const { error, value } = schema.validate(data, { 
       abortEarly: false,
@@ -90,7 +90,7 @@ export const customValidations = {
 /**
  * 日次訪問記録の追加バリデーション
  */
-export const validateDailyVisitRecord = (req: Request, res: Response, next: NextFunction) => {
+export const validateDailyVisitRecord = (req: Request, _res: Response, next: NextFunction) => {
   const { startTime, endTime, status, cancellationReason } = req.body;
 
   const errors: string[] = [];
@@ -123,7 +123,7 @@ export const validateDailyVisitRecord = (req: Request, res: Response, next: Next
 /**
  * 月次レポートの日付範囲バリデーション
  */
-export const validateReportDateRange = (req: Request, res: Response, next: NextFunction) => {
+export const validateReportDateRange = (req: Request, _res: Response, next: NextFunction) => {
   const { startDate, endDate } = req.query;
 
   if (startDate && endDate) {
@@ -149,7 +149,7 @@ export const validateReportDateRange = (req: Request, res: Response, next: NextF
  * IDパラメータのバリデーション
  */
 export const validateIdParam = (paramName: string = 'id') => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const id = req.params[paramName];
     const numericId = parseInt(id, 10);
 
@@ -171,7 +171,7 @@ export const validateIdParam = (paramName: string = 'id') => {
 /**
  * ページネーションパラメータのバリデーション
  */
-export const validatePaginationParams = (req: Request, res: Response, next: NextFunction) => {
+export const validatePaginationParams = (req: Request, _res: Response, next: NextFunction) => {
   const { page = '1', limit = '10' } = req.query;
 
   const pageNum = parseInt(page as string, 10);

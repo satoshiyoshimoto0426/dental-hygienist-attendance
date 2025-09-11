@@ -3,7 +3,7 @@ import {
   CreateDailyVisitRecordInput, 
   UpdateDailyVisitRecordInput 
 } from '../types/DailyVisitRecord';
-import { ApiResponse } from '../types/Api';
+import { ApiResult } from '../types/Api';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -52,10 +52,10 @@ export class DailyVisitRecordService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: ApiResponse<DailyVisitRecord[]> = await response.json();
+      const result: ApiResult<DailyVisitRecord[]> = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error?.message || '日次訪問記録の取得に失敗しました');
+        throw new Error('error' in result ? result.error.message : '日次訪問記録の取得に失敗しました');
       }
 
       return result.data;
@@ -82,10 +82,10 @@ export class DailyVisitRecordService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: ApiResponse<DailyVisitRecord> = await response.json();
+      const result: ApiResult<DailyVisitRecord> = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error?.message || '日次訪問記録の取得に失敗しました');
+        throw new Error('error' in result ? result.error.message : '日次訪問記録の取得に失敗しました');
       }
 
       return result.data;
@@ -113,10 +113,10 @@ export class DailyVisitRecordService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: ApiResponse<DailyVisitRecord> = await response.json();
+      const result: ApiResult<DailyVisitRecord> = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error?.message || '日次訪問記録の作成に失敗しました');
+        throw new Error('error' in result ? result.error.message : '日次訪問記録の作成に失敗しました');
       }
 
       return result.data;
@@ -144,10 +144,10 @@ export class DailyVisitRecordService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: ApiResponse<DailyVisitRecord> = await response.json();
+      const result: ApiResult<DailyVisitRecord> = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error?.message || '日次訪問記録の更新に失敗しました');
+        throw new Error('error' in result ? result.error.message : '日次訪問記録の更新に失敗しました');
       }
 
       return result.data;
@@ -174,10 +174,10 @@ export class DailyVisitRecordService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: ApiResponse<void> = await response.json();
+      const result: ApiResult<void> = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error?.message || '日次訪問記録の削除に失敗しました');
+        throw new Error('error' in result ? result.error.message : '日次訪問記録の削除に失敗しました');
       }
     } catch (error) {
       console.error('日次訪問記録削除エラー:', error);
@@ -215,10 +215,10 @@ export class DailyVisitRecordService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result: ApiResponse<any> = await response.json();
+      const result: ApiResult<any> = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error?.message || '月間統計の取得に失敗しました');
+        throw new Error('error' in result ? result.error.message : '月間統計の取得に失敗しました');
       }
 
       return result.data;

@@ -49,7 +49,7 @@ export const PatientReport: React.FC = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const patientsData = await PatientService.getAllPatients();
+        const patientsData = await PatientService.getPatients();
         setPatients(patientsData);
       } catch (error) {
         console.error('患者一覧取得エラー:', error);

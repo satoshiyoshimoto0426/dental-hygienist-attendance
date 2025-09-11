@@ -182,8 +182,8 @@ export const DailyVisitRecordForm: React.FC<DailyVisitRecordFormProps> = ({
       <Button 
         onClick={handleClose} 
         disabled={loading}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 2, sm: 1 } }}
+        fullWidth
+        sx={{ order: { xs: 2, sm: 1 }, width: { xs: '100%', sm: 'auto' } }}
       >
         キャンセル
       </Button>
@@ -191,8 +191,8 @@ export const DailyVisitRecordForm: React.FC<DailyVisitRecordFormProps> = ({
         onClick={handleSubmit} 
         variant="contained" 
         disabled={loading || hasErrors}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ order: { xs: 1, sm: 2 } }}
+        fullWidth
+        sx={{ order: { xs: 1, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}
       >
         {loading ? '保存中...' : '保存'}
       </Button>
