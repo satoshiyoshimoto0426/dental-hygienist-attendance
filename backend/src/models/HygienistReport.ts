@@ -51,13 +51,13 @@ export class HygienistReportModel {
 
       // 統計を計算
       const totalVisits = visits.length;
-      const completedVisits = visits.filter(v => v.status === 'completed').length;
-      const cancelledVisits = visits.filter(v => v.status === 'cancelled').length;
-      const scheduledVisits = visits.filter(v => v.status === 'scheduled').length;
+      const completedVisits = visits.filter((v: any) => v.status === 'completed').length;
+      const cancelledVisits = visits.filter((v: any) => v.status === 'cancelled').length;
+      const scheduledVisits = visits.filter((v: any) => v.status === 'scheduled').length;
 
       // 総時間と平均時間を計算
       let totalMinutes = 0;
-      const visitDetails: HygienistVisitDetail[] = visits.map(visit => {
+      const visitDetails: HygienistVisitDetail[] = visits.map((visit: any) => {
         let duration: number | undefined;
         
         if (visit.start_time && visit.end_time && visit.status === 'completed') {
