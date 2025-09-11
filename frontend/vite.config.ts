@@ -4,7 +4,7 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'production' ? '/dental-hygienist-attendance/' : '/',
+  base: '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
