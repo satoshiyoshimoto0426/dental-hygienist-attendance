@@ -1,4 +1,11 @@
-# 歯科衛生士月間勤怠システム
+# 🦆 歯科衛生士月間勤怠システム
+
+## 🎆 ワンクリックでデプロイ！
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/satoshiyoshimoto0426/dental-hygienist-attendance&project-name=dental-hygienist-system&repository-name=dental-hygienist-system&root-directory=frontend&build-command=npm%20install%20%26%26%20npm%20run%20build&install-command=npm%20install&output-directory=dist)
+
+上記のボタンをクリックするだけで、無料でデプロイできます！
+👉 **[詳しい手順はこちら](EASY_DEPLOY.md)** 👈
 
 歯科衛生士の患者訪問記録を効率的に管理し、月間の訪問実績を追跡するためのWebアプリケーションです。
 
