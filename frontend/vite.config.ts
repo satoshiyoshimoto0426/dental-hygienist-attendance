@@ -4,7 +4,7 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/dental-hygienist-attendance/',
+  base: process.env.NODE_ENV === 'production' ? '/dental-hygienist-attendance/' : '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -13,6 +13,11 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0',
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '.e2b.dev', // Allow all e2b.dev subdomains
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
