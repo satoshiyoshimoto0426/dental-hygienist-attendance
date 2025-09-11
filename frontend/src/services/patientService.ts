@@ -1,10 +1,16 @@
 import apiClient from './api';
 import { Patient, CreatePatientRequest, UpdatePatientRequest } from '../types/Patient';
 import { ApiResponse } from '../types/Api';
+import { isDemoMode } from '../config/environment';
+import { mockService } from './mockService';
 
 export class PatientService {
   // 患者一覧取得
   static async getPatients(): Promise<Patient[]> {
+    if (isDemoMode) {
+      const patients = await mockService.getPatients();
+      return patients;
+    }
     try {
       const response = await apiClient.get<ApiResponse<Patient[]>>('/patients');
       return response.data.data;

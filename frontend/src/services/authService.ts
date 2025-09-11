@@ -1,6 +1,7 @@
 import { LoginRequest, LoginResponse, User } from '../types/Auth';
 import { api } from './api';
 import { isDemoMode } from '../config/environment';
+import { mockService } from './mockService';
 
 class AuthService {
   private static readonly TOKEN_KEY = 'auth_token';
@@ -9,7 +10,20 @@ class AuthService {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     // デモモードの場合はモックログインを実行
     if (isDemoMode) {
-      return this.mockLogin(credentials);
+      try {
+        const result = await mockService.login(credentials.username, credentials.password);
+        if (result.success) {
+          this.setToken(result.data.token);
+          this.setUser(result.data.user);
+          return {
+            success: true,
+            token: result.data.token,
+            user: result.data.user
+          };
+        }
+      } catch (error: any) {
+        throw new Error(error.message || 'ログインに失敗しました');
+      }
     }
 
     try {
