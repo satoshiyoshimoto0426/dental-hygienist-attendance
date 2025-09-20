@@ -1,5 +1,8 @@
 {
-  "dependencies": {
-    "pm2": "^6.0.10"
+  "name": "dental-hygienist-attendance",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm install --legacy-peer-deps && npm run build",
+    "install": "cd frontend && npm install --legacy-peer-deps"
   }
 }
