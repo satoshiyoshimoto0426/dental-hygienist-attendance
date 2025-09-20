@@ -10,9 +10,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { Download, Print, Description } from '@mui/icons-material';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import ja from 'date-fns/locale/ja';
-import * as XLSX from 'xlsx';
 import { mockPatients, mockHygienists, mockVisitRecords } from '../services/mockData';
 import { VisitRecord, Patient, Hygienist } from '../types';
+import { exportPatientMonthlyReport, exportHygienistMonthlyReport } from '../utils/excelExport';
 
 export default function Reports() {
   const [reportType, setReportType] = useState<'patient' | 'hygienist'>('patient');
@@ -98,93 +98,24 @@ export default function Reports() {
     };
   }, [selectedHygienistId, monthlyRecords]);
 
-  // Excel出力機能
+  // Excel出力機能（新しいA4単一シート形式を使用）
   const exportToExcel = () => {
-    const wb = XLSX.utils.book_new();
-    
     if (reportType === 'patient' && patientStatistics) {
-      // 患者情報シート
-      const patientInfo = [
-        ['患者月間レポート'],
-        [''],
-        ['対象月', format(selectedMonth, 'yyyy年MM月', { locale: ja })],
-        [''],
-        ['患者情報'],
-        ['患者ID', patientStatistics.patient.patientId],
-        ['氏名', patientStatistics.patient.name],
-        ['カナ', patientStatistics.patient.kana],
-        ['生年月日', patientStatistics.patient.birthDate],
-        ['年齢', `${patientStatistics.patient.age}歳`],
-        ['住所', patientStatistics.patient.address],
-        ['電話番号', patientStatistics.patient.phone],
-        ['要介護度', patientStatistics.patient.careLevel || ''],
-        [''],
-        ['月間サマリー'],
-        ['総訪問回数', `${patientStatistics.totalVisits}回`],
-        ['完了訪問', `${patientStatistics.completedVisits}回`],
-        ['キャンセル', `${patientStatistics.cancelledVisits}回`],
-        ['総ケア時間', `${patientStatistics.totalHours}時間`],
-      ];
-
-      // 訪問記録シート
-      const visitRecords = [
-        ['訪問日', '担当衛生士', '時間', 'サービス内容', 'ケア詳細', '患者状態', '家族コメント']
-      ];
-      
-      patientStatistics.records.forEach(record => {
-        const hygienist = mockHygienists.find(h => h.id === record.hygienistId);
-        visitRecords.push([
-          format(parseISO(record.visitDate), 'MM/dd'),
-          hygienist?.name || '',
-          `${record.startTime}-${record.endTime}`,
-          record.serviceType.join('、'),
-          record.careDetails || '',
-          record.patientCondition || '',
-          record.familyComments || ''
-        ]);
-      });
-
-      const ws1 = XLSX.utils.aoa_to_sheet(patientInfo);
-      const ws2 = XLSX.utils.aoa_to_sheet(visitRecords);
-      
-      XLSX.utils.book_append_sheet(wb, ws1, '患者情報・サマリー');
-      XLSX.utils.book_append_sheet(wb, ws2, '訪問記録詳細');
-      
-      XLSX.writeFile(wb, `患者レポート_${patientStatistics.patient.name}_${format(selectedMonth, 'yyyyMM')}.xlsx`);
-      
+      // 患者月間レポートを単一シートA4形式で出力
+      exportPatientMonthlyReport(
+        patientStatistics.patient,
+        patientStatistics.records,
+        selectedMonth,
+        mockHygienists
+      );
     } else if (reportType === 'hygienist' && hygienistStatistics) {
-      // 歯科衛生士レポート
-      const hygienistReport = [
-        ['歯科衛生士月間勤務レポート'],
-        [''],
-        ['対象月', format(selectedMonth, 'yyyy年MM月', { locale: ja })],
-        ['衛生士名', hygienistStatistics.hygienist.name],
-        [''],
-        ['勤務統計'],
-        ['総訪問回数', `${hygienistStatistics.totalVisits}回`],
-        ['担当患者数', `${hygienistStatistics.totalPatients}名`],
-        ['総勤務時間', `${hygienistStatistics.totalHours}時間`],
-        ['平均訪問時間', `${hygienistStatistics.averageVisitTime}分`],
-        [''],
-        ['訪問記録一覧'],
-        ['訪問日', '患者名', '時間', 'サービス内容', 'ステータス']
-      ];
-      
-      hygienistStatistics.records.forEach(record => {
-        const patient = mockPatients.find(p => p.id === record.patientId);
-        hygienistReport.push([
-          format(parseISO(record.visitDate), 'MM/dd'),
-          patient?.name || '',
-          `${record.startTime}-${record.endTime}`,
-          record.serviceType.join('、'),
-          record.status === 'completed' ? '完了' : record.status === 'cancelled' ? 'キャンセル' : '予定'
-        ]);
-      });
-
-      const ws = XLSX.utils.aoa_to_sheet(hygienistReport);
-      XLSX.utils.book_append_sheet(wb, ws, '勤務レポート');
-      
-      XLSX.writeFile(wb, `衛生士レポート_${hygienistStatistics.hygienist.name}_${format(selectedMonth, 'yyyyMM')}.xlsx`);
+      // 歯科衛生士勤務レポートを単一シートA4形式で出力
+      exportHygienistMonthlyReport(
+        hygienistStatistics.hygienist,
+        hygienistStatistics.records,
+        selectedMonth,
+        mockPatients
+      );
     }
   };
 

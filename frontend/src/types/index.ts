@@ -12,6 +12,11 @@ export interface Patient {
   emergencyContact?: string;
   emergencyPhone?: string;
   careLevel?: string; // 要介護度
+  // 新規追加フィールド
+  dentalClinic?: string; // 歯科クリニック
+  dentist?: string; // 歯科医師
+  careOffice?: string; // 居宅介護支援事業所
+  careManager?: string; // ケアマネージャー
   medicalHistory?: string;
   medications?: string;
   allergies?: string;
