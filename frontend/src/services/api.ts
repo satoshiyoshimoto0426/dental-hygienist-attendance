@@ -1,6 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { ApiResponse, ApiError } from '../types/Api';
-import { config, shouldLog } from '../config/environment';
+import { isDevelopment } from '../config/environment';
+
+const shouldLog = isDevelopment;
 
 // エラーメッセージのマッピング
 const ERROR_MESSAGES: Record<string, string> = {

@@ -1,81 +1,51 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import jaLocale from 'date-fns/locale/ja';
 import { AuthProvider } from './contexts/AuthContext';
-import { ErrorProvider } from './contexts/ErrorContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { Layout } from './components/common/Layout';
-import { ErrorDisplay } from './components/common/ErrorDisplay';
-import { Login } from './pages/Login';
-import { Dashboard } from './pages/Dashboard';
-import PatientMaster from './components/masters/PatientMaster';
-import HygienistMaster from './components/masters/HygienistMaster';
-import { DailyVisitRecords } from './components/visits/DailyVisitRecords';
-import { PatientReports } from './pages/PatientReports';
-import './styles/responsive.css';
+import { DataProvider } from './contexts/DataContext';
+import { modernTheme } from './theme/modernTheme';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import PatientList from './pages/PatientList';
+import HygienistList from './pages/HygienistList';
+import VisitRecords from './pages/VisitRecords';
+import Reports from './pages/Reports';
+import Layout from './components/Layout';
+import PrivateRoute from './components/PrivateRoute';
 
-const App: React.FC = () => {
+function App() {
   return (
-    <ErrorProvider>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/patients"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <PatientMaster />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/hygienists"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <HygienistMaster />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/attendance"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <DailyVisitRecords />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <PatientReports />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-        <ErrorDisplay />
-      </AuthProvider>
-    </ErrorProvider>
+    <ThemeProvider theme={modernTheme}>
+      <CssBaseline />
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={jaLocale}>
+        <AuthProvider>
+          <DataProvider>
+            <Router>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={
+                  <PrivateRoute>
+                    <Layout />
+                  </PrivateRoute>
+                }>
+                  <Route index element={<Navigate to="/dashboard" replace />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="patients" element={<PatientList />} />
+                  <Route path="hygienists" element={<HygienistList />} />
+                  <Route path="visits" element={<VisitRecords />} />
+                  <Route path="reports" element={<Reports />} />
+                </Route>
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </Router>
+          </DataProvider>
+        </AuthProvider>
+      </LocalizationProvider>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;

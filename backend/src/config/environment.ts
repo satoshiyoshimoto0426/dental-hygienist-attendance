@@ -57,7 +57,7 @@ export interface EnvironmentConfig {
 // 環境変数の検証とデフォルト値の設定
 const getEnvironmentConfig = (): EnvironmentConfig => {
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const useMockDB = process.env.USE_MOCK_DB === 'true';
+  const useMockDB = process.env.USE_MOCK_DATABASE === 'true' || process.env.USE_MOCK_DB === 'true';
   
   // 開発環境でモックDBを使用する場合は、DB設定をスキップ
   if (!isDevelopment || !useMockDB) {
