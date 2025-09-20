@@ -1,60 +1,398 @@
-import React from 'react';
-import { Box, Typography, Paper, Grid, Button } from '@mui/material';
-import { Download, Print } from '@mui/icons-material';
+import React, { useState, useMemo } from 'react';
+import {
+  Box, Typography, Paper, Grid, Button, FormControl, InputLabel, Select,
+  MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Card, CardContent, Divider, Chip
+} from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { Download, Print, Description } from '@mui/icons-material';
+import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import ja from 'date-fns/locale/ja';
+import * as XLSX from 'xlsx';
+import { mockPatients, mockHygienists, mockVisitRecords } from '../services/mockData';
+import { VisitRecord, Patient, Hygienist } from '../types';
 
 export default function Reports() {
+  const [reportType, setReportType] = useState<'patient' | 'hygienist'>('patient');
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [selectedPatientId, setSelectedPatientId] = useState<number | ''>('');
+  const [selectedHygienistId, setSelectedHygienistId] = useState<number | ''>('');
+
+  // 月間の訪問記録をフィルタリング
+  const monthlyRecords = useMemo(() => {
+    const start = startOfMonth(selectedMonth);
+    const end = endOfMonth(selectedMonth);
+    
+    return mockVisitRecords.filter(record => {
+      const recordDate = parseISO(record.visitDate);
+      return isWithinInterval(recordDate, { start, end });
+    });
+  }, [selectedMonth]);
+
+  // 患者別統計
+  const patientStatistics = useMemo(() => {
+    if (!selectedPatientId) return null;
+    
+    const patientRecords = monthlyRecords.filter(r => r.patientId === selectedPatientId);
+    const patient = mockPatients.find(p => p.id === selectedPatientId);
+    
+    if (!patient) return null;
+
+    const serviceCount: { [key: string]: number } = {};
+    let totalMinutes = 0;
+
+    patientRecords.forEach(record => {
+      // サービス種別カウント
+      record.serviceType.forEach(type => {
+        serviceCount[type] = (serviceCount[type] || 0) + 1;
+      });
+      
+      // 訪問時間計算
+      if (record.startTime && record.endTime) {
+        const [startHour, startMin] = record.startTime.split(':').map(Number);
+        const [endHour, endMin] = record.endTime.split(':').map(Number);
+        totalMinutes += (endHour * 60 + endMin) - (startHour * 60 + startMin);
+      }
+    });
+
+    return {
+      patient,
+      totalVisits: patientRecords.length,
+      completedVisits: patientRecords.filter(r => r.status === 'completed').length,
+      cancelledVisits: patientRecords.filter(r => r.status === 'cancelled').length,
+      totalHours: Math.round(totalMinutes / 60 * 10) / 10,
+      serviceBreakdown: serviceCount,
+      records: patientRecords
+    };
+  }, [selectedPatientId, monthlyRecords]);
+
+  // 歯科衛生士別統計
+  const hygienistStatistics = useMemo(() => {
+    if (!selectedHygienistId) return null;
+    
+    const hygienistRecords = monthlyRecords.filter(r => r.hygienistId === selectedHygienistId);
+    const hygienist = mockHygienists.find(h => h.id === selectedHygienistId);
+    
+    if (!hygienist) return null;
+
+    const patientCount = new Set(hygienistRecords.map(r => r.patientId)).size;
+    let totalMinutes = 0;
+
+    hygienistRecords.forEach(record => {
+      if (record.startTime && record.endTime) {
+        const [startHour, startMin] = record.startTime.split(':').map(Number);
+        const [endHour, endMin] = record.endTime.split(':').map(Number);
+        totalMinutes += (endHour * 60 + endMin) - (startHour * 60 + startMin);
+      }
+    });
+
+    return {
+      hygienist,
+      totalVisits: hygienistRecords.length,
+      totalPatients: patientCount,
+      totalHours: Math.round(totalMinutes / 60 * 10) / 10,
+      averageVisitTime: hygienistRecords.length > 0 ? Math.round(totalMinutes / hygienistRecords.length) : 0,
+      records: hygienistRecords
+    };
+  }, [selectedHygienistId, monthlyRecords]);
+
+  // Excel出力機能
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+    
+    if (reportType === 'patient' && patientStatistics) {
+      // 患者情報シート
+      const patientInfo = [
+        ['患者月間レポート'],
+        [''],
+        ['対象月', format(selectedMonth, 'yyyy年MM月', { locale: ja })],
+        [''],
+        ['患者情報'],
+        ['患者ID', patientStatistics.patient.patientId],
+        ['氏名', patientStatistics.patient.name],
+        ['カナ', patientStatistics.patient.kana],
+        ['生年月日', patientStatistics.patient.birthDate],
+        ['年齢', `${patientStatistics.patient.age}歳`],
+        ['住所', patientStatistics.patient.address],
+        ['電話番号', patientStatistics.patient.phone],
+        ['要介護度', patientStatistics.patient.careLevel || ''],
+        [''],
+        ['月間サマリー'],
+        ['総訪問回数', `${patientStatistics.totalVisits}回`],
+        ['完了訪問', `${patientStatistics.completedVisits}回`],
+        ['キャンセル', `${patientStatistics.cancelledVisits}回`],
+        ['総ケア時間', `${patientStatistics.totalHours}時間`],
+      ];
+
+      // 訪問記録シート
+      const visitRecords = [
+        ['訪問日', '担当衛生士', '時間', 'サービス内容', 'ケア詳細', '患者状態', '家族コメント']
+      ];
+      
+      patientStatistics.records.forEach(record => {
+        const hygienist = mockHygienists.find(h => h.id === record.hygienistId);
+        visitRecords.push([
+          format(parseISO(record.visitDate), 'MM/dd'),
+          hygienist?.name || '',
+          `${record.startTime}-${record.endTime}`,
+          record.serviceType.join('、'),
+          record.careDetails || '',
+          record.patientCondition || '',
+          record.familyComments || ''
+        ]);
+      });
+
+      const ws1 = XLSX.utils.aoa_to_sheet(patientInfo);
+      const ws2 = XLSX.utils.aoa_to_sheet(visitRecords);
+      
+      XLSX.utils.book_append_sheet(wb, ws1, '患者情報・サマリー');
+      XLSX.utils.book_append_sheet(wb, ws2, '訪問記録詳細');
+      
+      XLSX.writeFile(wb, `患者レポート_${patientStatistics.patient.name}_${format(selectedMonth, 'yyyyMM')}.xlsx`);
+      
+    } else if (reportType === 'hygienist' && hygienistStatistics) {
+      // 歯科衛生士レポート
+      const hygienistReport = [
+        ['歯科衛生士月間勤務レポート'],
+        [''],
+        ['対象月', format(selectedMonth, 'yyyy年MM月', { locale: ja })],
+        ['衛生士名', hygienistStatistics.hygienist.name],
+        [''],
+        ['勤務統計'],
+        ['総訪問回数', `${hygienistStatistics.totalVisits}回`],
+        ['担当患者数', `${hygienistStatistics.totalPatients}名`],
+        ['総勤務時間', `${hygienistStatistics.totalHours}時間`],
+        ['平均訪問時間', `${hygienistStatistics.averageVisitTime}分`],
+        [''],
+        ['訪問記録一覧'],
+        ['訪問日', '患者名', '時間', 'サービス内容', 'ステータス']
+      ];
+      
+      hygienistStatistics.records.forEach(record => {
+        const patient = mockPatients.find(p => p.id === record.patientId);
+        hygienistReport.push([
+          format(parseISO(record.visitDate), 'MM/dd'),
+          patient?.name || '',
+          `${record.startTime}-${record.endTime}`,
+          record.serviceType.join('、'),
+          record.status === 'completed' ? '完了' : record.status === 'cancelled' ? 'キャンセル' : '予定'
+        ]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(hygienistReport);
+      XLSX.utils.book_append_sheet(wb, ws, '勤務レポート');
+      
+      XLSX.writeFile(wb, `衛生士レポート_${hygienistStatistics.hygienist.name}_${format(selectedMonth, 'yyyyMM')}.xlsx`);
+    }
+  };
+
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        レポート
+        月間レポート
       </Typography>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              月次訪問統計
-            </Typography>
-            <Typography color="text.secondary" paragraph>
-              今月の訪問数: 245件
-            </Typography>
-            <Typography color="text.secondary" paragraph>
-              前月比: +12%
-            </Typography>
-            <Button variant="outlined" startIcon={<Download />}>
-              CSV出力
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>レポート種別</InputLabel>
+              <Select value={reportType} onChange={(e) => setReportType(e.target.value as any)}>
+                <MenuItem value="patient">患者別レポート</MenuItem>
+                <MenuItem value="hygienist">歯科衛生士別レポート</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+              <DatePicker
+                label="対象月"
+                value={selectedMonth}
+                onChange={(newValue) => newValue && setSelectedMonth(newValue)}
+                views={['year', 'month']}
+                slotProps={{ textField: { fullWidth: true } }}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            {reportType === 'patient' ? (
+              <FormControl fullWidth>
+                <InputLabel>患者選択</InputLabel>
+                <Select value={selectedPatientId} onChange={(e) => setSelectedPatientId(Number(e.target.value))}>
+                  {mockPatients.map(patient => (
+                    <MenuItem key={patient.id} value={patient.id}>
+                      {patient.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <FormControl fullWidth>
+                <InputLabel>歯科衛生士選択</InputLabel>
+                <Select value={selectedHygienistId} onChange={(e) => setSelectedHygienistId(Number(e.target.value))}>
+                  {mockHygienists.map(hygienist => (
+                    <MenuItem key={hygienist.id} value={hygienist.id}>
+                      {hygienist.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<Download />}
+              onClick={exportToExcel}
+              fullWidth
+              disabled={reportType === 'patient' ? !selectedPatientId : !selectedHygienistId}
+            >
+              Excel出力
             </Button>
-          </Paper>
+          </Grid>
         </Grid>
+      </Paper>
 
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              患者別レポート
-            </Typography>
-            <Typography color="text.secondary" paragraph>
-              アクティブ患者数: 128名
-            </Typography>
-            <Typography color="text.secondary" paragraph>
-              新規患者数: 8名
-            </Typography>
-            <Button variant="outlined" startIcon={<Print />}>
-              印刷
-            </Button>
-          </Paper>
+      {/* 患者レポート表示 */}
+      {reportType === 'patient' && patientStatistics && (
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>患者情報</Typography>
+                <Typography variant="body2">氏名: {patientStatistics.patient.name}</Typography>
+                <Typography variant="body2">年齢: {patientStatistics.patient.age}歳</Typography>
+                <Typography variant="body2">要介護度: {patientStatistics.patient.careLevel}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>月間統計</Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">総訪問回数</Typography>
+                    <Typography variant="h5">{patientStatistics.totalVisits}</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">完了</Typography>
+                    <Typography variant="h5">{patientStatistics.completedVisits}</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">キャンセル</Typography>
+                    <Typography variant="h5">{patientStatistics.cancelledVisits}</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">総時間</Typography>
+                    <Typography variant="h5">{patientStatistics.totalHours}h</Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>訪問日</TableCell>
+                    <TableCell>担当衛生士</TableCell>
+                    <TableCell>時間</TableCell>
+                    <TableCell>サービス内容</TableCell>
+                    <TableCell>状態</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {patientStatistics.records.map((record) => {
+                    const hygienist = mockHygienists.find(h => h.id === record.hygienistId);
+                    return (
+                      <TableRow key={record.id}>
+                        <TableCell>{format(parseISO(record.visitDate), 'MM/dd (E)', { locale: ja })}</TableCell>
+                        <TableCell>{hygienist?.name}</TableCell>
+                        <TableCell>{record.startTime} - {record.endTime}</TableCell>
+                        <TableCell>{record.serviceType.join('、')}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={record.status === 'completed' ? '完了' : record.status === 'cancelled' ? 'キャンセル' : '予定'}
+                            color={record.status === 'completed' ? 'success' : record.status === 'cancelled' ? 'error' : 'warning'}
+                            size="small"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         </Grid>
+      )}
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              歯科衛生士別パフォーマンス
-            </Typography>
-            <Typography color="text.secondary">
-              月間平均訪問数: 20.4件/人
-            </Typography>
-          </Paper>
+      {/* 歯科衛生士レポート表示 */}
+      {reportType === 'hygienist' && hygienistStatistics && (
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  {hygienistStatistics.hygienist.name}の月間勤務統計
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">総訪問回数</Typography>
+                    <Typography variant="h5">{hygienistStatistics.totalVisits}回</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">担当患者数</Typography>
+                    <Typography variant="h5">{hygienistStatistics.totalPatients}名</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">総勤務時間</Typography>
+                    <Typography variant="h5">{hygienistStatistics.totalHours}時間</Typography>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Typography variant="body2" color="text.secondary">平均訪問時間</Typography>
+                    <Typography variant="h5">{hygienistStatistics.averageVisitTime}分</Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>訪問日</TableCell>
+                    <TableCell>患者名</TableCell>
+                    <TableCell>時間</TableCell>
+                    <TableCell>サービス内容</TableCell>
+                    <TableCell>ケア内容</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {hygienistStatistics.records.map((record) => {
+                    const patient = mockPatients.find(p => p.id === record.patientId);
+                    return (
+                      <TableRow key={record.id}>
+                        <TableCell>{format(parseISO(record.visitDate), 'MM/dd (E)', { locale: ja })}</TableCell>
+                        <TableCell>{patient?.name}</TableCell>
+                        <TableCell>{record.startTime} - {record.endTime}</TableCell>
+                        <TableCell>{record.serviceType.join('、')}</TableCell>
+                        <TableCell>{record.careDetails}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Box>
   );
 }
