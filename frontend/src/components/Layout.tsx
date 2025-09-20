@@ -16,7 +16,7 @@ export default function Layout() {
   const { logout } = useAuth();
 
   const menuItems = [
-    { text: 'ダッシュボード', icon: <Dashboard />, path: '/dashboard' },
+    { text: '管理画面', icon: <Dashboard />, path: '/dashboard' },
     { text: '患者一覧', icon: <People />, path: '/patients' },
     { text: '歯科衛生士一覧', icon: <PersonAdd />, path: '/hygienists' },
     { text: '訪問記録', icon: <CalendarMonth />, path: '/visits' },

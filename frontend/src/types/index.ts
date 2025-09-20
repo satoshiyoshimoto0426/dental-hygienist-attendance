@@ -127,3 +127,57 @@ export interface MonthlyReport {
   };
   nextMonthPlan: string;
 }
+
+// 予約情報
+export interface Appointment {
+  id: number;
+  patientId: number;
+  hygienistId: number;
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
+  serviceType: ServiceType[];
+  notes?: string;
+  status: 'confirmed' | 'pending' | 'cancelled';
+  reminderSent?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 通知
+export interface Notification {
+  id: number;
+  type: 'appointment_reminder' | 'report_ready' | 'system_update' | 'performance_alert';
+  title: string;
+  message: string;
+  recipient: 'admin' | 'hygienist' | 'all';
+  recipientId?: number;
+  date: string;
+  isRead: boolean;
+  priority: 'high' | 'medium' | 'low';
+  actionUrl?: string;
+  createdAt: string;
+}
+
+// 業績分析
+export interface PerformanceMetrics {
+  period: string;
+  hygienistId?: number;
+  metrics: {
+    totalVisits: number;
+    completionRate: number;
+    averageVisitDuration: number;
+    patientSatisfactionScore?: number;
+    productivityScore: number;
+    revenueGenerated?: number;
+  };
+  trends: {
+    visitGrowthRate: number;
+    efficiencyImprovement: number;
+  };
+  goals: {
+    targetVisits: number;
+    targetRevenue?: number;
+    achievementRate: number;
+  };
+}
